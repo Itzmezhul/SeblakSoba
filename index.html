@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Sistem Manajemen Warung Seblak Soba</title>
+    <!-- SheetJS untuk export Excel -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -322,12 +324,11 @@
     <div class="app-container">
         <div class="hero-header">
             <h1>🍜 SISTEM WARUNG SEBLAK SOBA 🔥</h1>
-            <div class="sub">Pedasnya Nagih, Manajemennya Modern!</div>
+            <div class="sub">!!Pedasnya membara, Sensasinya juara!!</div>
         </div>
         <div class="team-names">
             Dibuat oleh Kelompok 1 :
-            <span>Nadzral</span> <span>Gefira</span> <span>Chandra</span> <span>Dede Hidayat</span>
-            <span>Raihan</span>
+            <span>Nadzral</span> <span>Gefira</span> <span>Chandra</span> <span>Dede Hidayat</span> <span>Raihan</span>
         </div>
 
         <div class="tab-nav">
@@ -342,7 +343,7 @@
                 <div class="card-title">📝 Form Pesanan Baru</div>
                 <div class="form-group">
                     <label>Nama Pelanggan :</label>
-                    <input type="text" id="namaPelanggan" placeholder="Masukkan Nama Pelanggan" style="flex:2">
+                    <input type="text" id="namaPelanggan" placeholder="Masukkan nama pelanggan" style="flex:2">
                 </div>
                 <div class="form-group">
                     <label>Jenis Layanan :</label>
@@ -401,7 +402,7 @@
                     </select>
                     <label>Jumlah Dibayar :</label>
                     <input type="number" id="jumlahBayar" placeholder="0" style="width:140px">
-                    <button id="prosesCheckoutBtn" style="background:#b91c1c;">✅ Proses & Cetak Antrian</button>
+                    <button id="prosesCheckoutBtn" style="background:#b91c1c;">Proses & Cetak Antrian</button>
                 </div>
                 <div id="checkoutMessage" style="margin-top: 8px; font-weight: 500;"></div>
             </div>
@@ -419,7 +420,7 @@
                 <div id="antrianKokiList" style="overflow-x:auto;">
                     Tabel antrian akan muncul disini.
                 </div>
-                <button id="refreshKoki" class="btn-warning" style="margin-top:1rem;">🔄 Refresh Antrian</button>
+                <button id="refreshKoki" class="btn-warning" style="margin-top:1rem;">Refresh Antrian</button>
             </div>
         </div>
 
@@ -431,6 +432,7 @@
                     <label>Pilih Tanggal Laporan :</label>
                     <input type="date" id="tanggalLaporan" value="2025-06-01">
                     <button id="generateLaporanBtn">Tampilkan Laporan</button>
+                    <button id="downloadLaporanBtn" style="background:#2c7a4d;">Download Laporan (XLSX)</button>
                 </div>
                 <div id="laporanHasil">
                     <p>Silakan pilih tanggal untuk melihat total pendapatan dan rincian menu terjual.</p>
@@ -465,6 +467,9 @@
         let antrianArr = [];        // {ID_Antrian, ID_Pesanan, Nomor_Antrian, Waktu_Masuk, Status_Antrian, Waktu_Selesai}
         let transaksiArr = [];      // {ID_Transaksi, ID_Pesanan, Tanggal_Waktu, Jumlah_Dibayar, Metode_Bayar, Status, Kembalian}
         let strukArr = [];          // Untuk menyimpan data struk sesuai ERD (Nomor_Struk, ID_Transaksi, ID_Pesanan, Tanggal_Waktu, Total_Bayar, Metode_Bayar, Kembalian)
+
+        // Variabel untuk menyimpan data laporan terakhir (untuk keperluan download)
+        let lastLaporanData = { tanggal: "", totalPenjualan: 0, rincian: [] };
 
         // Helper ID Generator
         function generateId(prefix, arr, field) {
@@ -788,7 +793,7 @@
             }
         }
 
-        // OWNER: laporan berdasarkan tanggal
+        // OWNER: laporan berdasarkan tanggal (sekaligus menyimpan data untuk download)
         function generateLaporan() {
             let tglInput = document.getElementById("tanggalLaporan").value;
             if (!tglInput) return;
@@ -797,10 +802,11 @@
             let transaksiFilter = transaksiArr.filter(t => t.Tanggal_Waktu.startsWith(formattedTarget));
             if (transaksiFilter.length === 0) {
                 document.getElementById("laporanHasil").innerHTML = `<div class="card">📭 Tidak ada transaksi pada tanggal ${tglInput}</div>`;
+                lastLaporanData = { tanggal: tglInput, totalPenjualan: 0, rincian: [] };
                 return;
             }
             let totalPenjualan = 0;
-            let mapVariasi = new Map();
+            let mapVariasi = new Map(); // key ID_Variasi -> {nama, jumlah, pendapatan}
             for (let trx of transaksiFilter) {
                 let pesan = pesananArr.find(p => p.ID_Pesanan === trx.ID_Pesanan);
                 if (pesan) totalPenjualan += pesan.Total_Harga;
@@ -816,9 +822,11 @@
                     }
                 }
             }
+            let rincianArray = [];
             let rincianHtml = `<table><thead><tr><th>Menu Variasi</th><th>Jumlah Terjual</th><th>Pendapatan</th></tr></thead><tbody>`;
-            for (let [_, val] of mapVariasi.entries()) {
+            for (let [id, val] of mapVariasi.entries()) {
                 rincianHtml += `<tr><td>${val.nama}</td><td>${val.jumlah}</td><td>Rp ${val.pendapatan.toLocaleString()}</td></tr>`;
+                rincianArray.push({ nama: val.nama, jumlah: val.jumlah, pendapatan: val.pendapatan });
             }
             rincianHtml += `</tbody></table>`;
             document.getElementById("laporanHasil").innerHTML = `
@@ -828,6 +836,43 @@
                 <hr>${rincianHtml}
             </div>
         `;
+            // simpan data laporan terakhir untuk download
+            lastLaporanData = {
+                tanggal: tglInput,
+                totalPenjualan: totalPenjualan,
+                rincian: rincianArray
+            };
+        }
+
+        // Fungsi download laporan ke file XLSX
+        function downloadLaporan() {
+            if (!lastLaporanData.tanggal || (lastLaporanData.rincian.length === 0 && lastLaporanData.totalPenjualan === 0)) {
+                alert("Tidak ada data laporan untuk diunduh. Pastikan Anda telah memilih tanggal dan menampilkan laporan terlebih dahulu.");
+                return;
+            }
+            // Siapkan data untuk sheet Excel
+            let sheetData = [
+                ["LAPORAN PENJUALAN SEBLAK SOBA"],
+                [`Tanggal: ${lastLaporanData.tanggal}`],
+                [`Total Pendapatan: Rp ${lastLaporanData.totalPenjualan.toLocaleString()}`],
+                [],
+                ["Rincian Penjualan per Menu Variasi"],
+                ["Menu Variasi", "Jumlah Terjual", "Pendapatan (Rp)"]
+            ];
+            for (let item of lastLaporanData.rincian) {
+                sheetData.push([item.nama, item.jumlah, item.pendapatan]);
+            }
+            // Tambahkan baris kosong dan footer
+            sheetData.push([], ["Dibuat oleh Sistem Warung Seblak Soba"], [new Date().toLocaleString()]);
+
+            // Buat workbook dan worksheet
+            const ws = XLSX.utils.aoa_to_sheet(sheetData);
+            // Atur lebar kolom (opsional)
+            ws['!cols'] = [{ wch: 25 }, { wch: 15 }, { wch: 18 }];
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Laporan Penjualan");
+            // Export file
+            XLSX.writeFile(wb, `Laporan_Penjualan_${lastLaporanData.tanggal}.xlsx`);
         }
 
         // event binding & init
@@ -836,6 +881,7 @@
         document.getElementById("prosesCheckoutBtn").addEventListener("click", prosesCheckout);
         document.getElementById("refreshKoki")?.addEventListener("click", refreshKokiView);
         document.getElementById("generateLaporanBtn")?.addEventListener("click", generateLaporan);
+        document.getElementById("downloadLaporanBtn")?.addEventListener("click", downloadLaporan);
         updateVariasiSelect();
         renderKeranjang();
         renderPreviewPesanan();
