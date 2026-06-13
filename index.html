@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Sistem Manajemen Warung Seblak Soba</title>
-    <!-- SheetJS untuk export Excel -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <style>
         * {
@@ -192,6 +191,14 @@
             background: #d97706;
         }
 
+        .btn-success {
+            background: #15803d;
+        }
+
+        .btn-success:hover {
+            background: #166534;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -240,8 +247,15 @@
 
         .grid-2 {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 1.2rem;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
         }
 
         .modal-overlay {
@@ -255,6 +269,31 @@
             justify-content: center;
             align-items: center;
             z-index: 1000;
+        }
+
+        .modal-card {
+            background: white;
+            max-width: 500px;
+            width: 90%;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            border-top: 8px solid #dc2626;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .variasi-checkbox {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .variasi-checkbox label {
+            background: #fef3c7;
+            padding: 0.3rem 0.8rem;
+            border-radius: 30px;
+            cursor: pointer;
         }
 
         .struk-card {
@@ -304,6 +343,10 @@
                 padding: 0.5rem 1rem;
                 font-size: 0.9rem;
             }
+
+            .button-group {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -312,7 +355,7 @@
     <div class="app-container">
         <div class="hero-header">
             <h1>🍜 SISTEM WARUNG SEBLAK SOBA 🔥</h1>
-            <div class="sub">Pedasnya Nagih, Manajemennya Modern!</div>
+            <div class="sub">!!Pedasnya membara, Sensasinya juara!!</div>
         </div>
         <div class="team-names">
             Dibuat oleh Kelompok 1 :
@@ -325,7 +368,6 @@
             <button class="tab-btn" data-tab="owner">📊 OWNER · Laporan Penjualan</button>
         </div>
 
-        <!-- KASIR PANEL -->
         <div id="kasir" class="tab-content active">
             <div class="card">
                 <div class="card-title">📝 Form Pesanan Baru</div>
@@ -340,11 +382,7 @@
                         <option value="Take Away">🥡 Bawa Pulang</option>
                     </select>
                 </div>
-                <hr style="margin: 0.5rem 0; border-color:#ffe0b0;">
-                <div class="flex-between" style="margin-bottom: 0.5rem;">
-                    <strong>➕ Tambah Item ke Pesanan</strong>
-                    <small style="color:#b45309;">*Klik tambah untuk keranjang</small>
-                </div>
+                <hr>
                 <div class="grid-2">
                     <div>
                         <label>Kategori Menu :</label>
@@ -371,11 +409,14 @@
                         </select>
                         <small id="pedasInfoNote" style="display:block; font-size:11px;">(Hanya untuk Seblak)</small>
                     </div>
-                    <div style="display:flex; align-items:end;">
-                        <button id="tambahKeranjangBtn" style="background:#ca8a04;">➕ Tambah ke Keranjang</button>
+                    <div class="button-group">
+                        <button id="tambahKeranjangBtn" style="background:#ca8a04; flex:1;">➕ Tambah ke
+                            Keranjang</button>
+                        <button id="btnTambahPaket" style="background:#2c7a4d; flex:1;">🍲 Tambah Seblak Paket (Multi
+                            Topping)</button>
                     </div>
                 </div>
-                <hr style="margin: 1rem 0;">
+                <hr>
                 <div><strong>🛒 Keranjang Belanja</strong> <span id="jumlahItemKeranjang">0</span> item</div>
                 <div id="keranjangList" style="max-height: 280px; overflow-y: auto; margin: 1rem 0;"></div>
                 <div class="flex-between">
@@ -394,25 +435,20 @@
                 </div>
                 <div id="checkoutMessage" style="margin-top: 8px; font-weight: 500;"></div>
             </div>
-            <!-- data pesanan terbaru (preview) -->
             <div class="card">
                 <div class="card-title">📋 Pesanan Terakhir / Aktif</div>
                 <div id="pesananTerbaruPreview">Memuat data...</div>
             </div>
         </div>
 
-        <!-- KOKI PANEL -->
         <div id="koki" class="tab-content">
             <div class="card">
                 <div class="card-title">👨‍🍳 Antrian Dapur - Status Masakan</div>
-                <div id="antrianKokiList" style="overflow-x:auto;">
-                    Tabel antrian akan muncul disini.
-                </div>
+                <div id="antrianKokiList" style="overflow-x:auto;"></div>
                 <button id="refreshKoki" class="btn-warning" style="margin-top:1rem;">Refresh Antrian</button>
             </div>
         </div>
 
-        <!-- OWNER PANEL -->
         <div id="owner" class="tab-content">
             <div class="card">
                 <div class="card-title">📈 Laporan Keuangan & Penjualan</div>
@@ -449,7 +485,6 @@
             { ID_Variasi: "VAR007", ID_Menu: "MNU002", Nama_Variasi: "Es Matcha", Harga: 6000 },
             { ID_Variasi: "VAR008", ID_Menu: "MNU002", Nama_Variasi: "Kopi", Harga: 3000 }
         ];
-
         const tingkatPedas = [
             { ID_Kepedasan: "KPD001", Nama_Level: "Tidak Pedas", Skala: 1 },
             { ID_Kepedasan: "KPD002", Nama_Level: "Pedas Sedang", Skala: 2 },
@@ -457,15 +492,10 @@
             { ID_Kepedasan: "KPD004", Nama_Level: "Ekstra Pedas", Skala: 4 }
         ];
 
-        // Data inti sistem
-        let pesananArr = [];
-        let detailPesananArr = [];
-        let antrianArr = [];
-        let transaksiArr = [];
-        let strukArr = [];
+        let pesananArr = [], detailPesananArr = [], antrianArr = [], transaksiArr = [], strukArr = [];
         let lastLaporanData = { tanggal: "", totalPenjualan: 0, rincian: [] };
+        let keranjang = [];
 
-        // Helper ID Generator
         function generateId(prefix, arr, field) {
             let max = 0;
             for (let item of arr) {
@@ -475,15 +505,13 @@
             let next = (max + 1).toString().padStart(3, '0');
             return prefix + next;
         }
-
         function getCurrentDateTime() {
             let now = new Date();
             let tanggal = `${now.getDate().toString().padStart(2, '0')}/${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getFullYear()}`;
             let waktu = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-            return { tanggal, waktu, full: now };
+            return { tanggal, waktu };
         }
 
-        // Inisialisasi data contoh dari soal (kondisi awal) - perbaiki Total_Bayar pada struk contoh
         function initContohData() {
             pesananArr = [
                 { ID_Pesanan: "PSN001", Tanggal: "01/06/2025", Waktu: "10:30", Nama_Pelanggan: "Ihsan", Total_Harga: 9000, Layanan: "Dine In" },
@@ -502,15 +530,12 @@
                 { ID_Transaksi: "TRX001", ID_Pesanan: "PSN001", Tanggal_Waktu: "01/06/2025 10:30", Jumlah_Dibayar: 10000, Metode_Bayar: "Tunai", Status: "Lunas", Kembalian: 1000 },
                 { ID_Transaksi: "TRX002", ID_Pesanan: "PSN002", Tanggal_Waktu: "01/06/2025 11:30", Jumlah_Dibayar: 5000, Metode_Bayar: "Qris", Status: "Lunas", Kembalian: 0 }
             ];
-            // Perbaikan: Total_Bayar pada struk harusnya total harga pesanan (9000 dan 5000), bukan jumlah bayar
             strukArr = [
                 { Nomor_Struk: "STR001", ID_Transaksi: "TRX001", ID_Pesanan: "PSN001", Tanggal_Waktu: "01/06/2025 10:30", Total_Bayar: 9000, Metode_Bayar: "Tunai", Kembalian: 1000 },
                 { Nomor_Struk: "STR002", ID_Transaksi: "TRX002", ID_Pesanan: "PSN002", Tanggal_Waktu: "01/06/2025 11:30", Total_Bayar: 5000, Metode_Bayar: "Qris", Kembalian: 0 }
             ];
         }
         initContohData();
-
-        let keranjang = [];
 
         function updateVariasiSelect() {
             let kategori = document.getElementById("kategoriMenu").value;
@@ -541,6 +566,7 @@
             if (kategoriMenu !== "MNU001") idKepedasan = null;
             let subtotal = variasi.Harga * jumlah;
             keranjang.push({
+                isPackage: false,
                 ID_Menu: variasi.ID_Menu,
                 ID_Variasi: variasi.ID_Variasi,
                 NamaVariasi: variasi.Nama_Variasi,
@@ -551,6 +577,68 @@
                 Subtotal: subtotal
             });
             renderKeranjang();
+        }
+
+        function bukaModalPaket() {
+            let variasiSeblak = variasiMenu.filter(v => v.ID_Menu === "MNU001");
+            let modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            let checkboxHtml = '';
+            variasiSeblak.forEach(v => {
+                checkboxHtml += `<label style="display:inline-flex; align-items:center; gap:6px;"><input type="checkbox" value="${v.ID_Variasi}" data-harga="${v.Harga}" data-nama="${v.Nama_Variasi}"> ${v.Nama_Variasi} (Rp ${v.Harga.toLocaleString()})</label>`;
+            });
+            modal.innerHTML = `
+            <div class="modal-card">
+                <h3>🍲 Tambah Paket Seblak (1 Porsi Banyak Topping)</h3>
+                <div class="form-group"><label>Jumlah Porsi:</label><input type="number" id="paketJumlahPorsi" value="1" min="1" style="width:80px"></div>
+                <div class="form-group"><label>Tingkat Pedas:</label><select id="paketLevelPedas">${tingkatPedas.map(l => `<option value="${l.ID_Kepedasan}">${l.Nama_Level}</option>`).join('')}</select></div>
+                <div><strong>Pilih Variasi (bisa lebih dari satu):</strong></div>
+                <div class="variasi-checkbox" style="display:flex; flex-wrap:wrap; gap:10px;">${checkboxHtml}</div>
+                <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:1rem;">
+                    <button id="batalPaket" class="btn-warning">Batal</button>
+                    <button id="simpanPaket" class="btn-success">Tambah ke Keranjang</button>
+                </div>
+            </div>
+        `;
+            document.body.appendChild(modal);
+            modal.querySelector('#batalPaket').onclick = () => modal.remove();
+            modal.querySelector('#simpanPaket').onclick = () => {
+                let checkboxes = modal.querySelectorAll('input[type="checkbox"]:checked');
+                if (checkboxes.length === 0) { alert("Pilih minimal satu variasi!"); return; }
+                let jumlahPorsi = parseInt(modal.querySelector('#paketJumlahPorsi').value);
+                if (isNaN(jumlahPorsi) || jumlahPorsi < 1) jumlahPorsi = 1;
+                let levelPedas = modal.querySelector('#paketLevelPedas').value;
+                let levelObj = tingkatPedas.find(l => l.ID_Kepedasan === levelPedas);
+                let namaPedas = levelObj ? levelObj.Nama_Level : "";
+                let selectedVariasi = [];
+                let totalHargaPaket = 0;
+                for (let cb of checkboxes) {
+                    let idVar = cb.value;
+                    let variasi = variasiMenu.find(v => v.ID_Variasi === idVar);
+                    if (variasi) {
+                        let subtotalItem = variasi.Harga * jumlahPorsi;
+                        totalHargaPaket += subtotalItem;
+                        selectedVariasi.push({
+                            ID_Variasi: idVar,
+                            NamaVariasi: variasi.Nama_Variasi,
+                            HargaSatuan: variasi.Harga,
+                            JumlahPerPorsi: 1,
+                            SubtotalItem: subtotalItem
+                        });
+                    }
+                }
+                keranjang.push({
+                    isPackage: true,
+                    porsi: jumlahPorsi,
+                    levelPedasId: levelPedas,
+                    levelPedasNama: namaPedas,
+                    variasiList: selectedVariasi,
+                    Subtotal: totalHargaPaket,
+                    deskripsi: `Seblak Paket (${selectedVariasi.map(v => v.NamaVariasi).join(', ')}) x${jumlahPorsi} porsi - Pedas: ${namaPedas}`
+                });
+                modal.remove();
+                renderKeranjang();
+            };
         }
 
         function renderKeranjang() {
@@ -566,10 +654,17 @@
             let total = 0;
             keranjang.forEach((item, idx) => {
                 total += item.Subtotal;
-                html += `<div class="keranjang-item flex-between">
-                        <div><strong>${item.NamaVariasi}</strong> x${item.Jumlah} ${item.NamaPedas ? `🌶️ ${item.NamaPedas}` : ''}<br>@${item.HargaSatuan.toLocaleString()}</div>
-                        <div>Rp ${item.Subtotal.toLocaleString()} <button class="btn-warning" style="padding:2px 8px;" onclick="hapusItemKeranjang(${idx})">✖</button></div>
-                    </div>`;
+                if (item.isPackage) {
+                    html += `<div class="keranjang-item flex-between">
+                            <div><strong>📦 ${item.deskripsi}</strong><br>Total: Rp ${item.Subtotal.toLocaleString()}</div>
+                            <div><button class="btn-warning" onclick="hapusItemKeranjang(${idx})">✖</button></div>
+                        </div>`;
+                } else {
+                    html += `<div class="keranjang-item flex-between">
+                            <div><strong>${item.NamaVariasi}</strong> x${item.Jumlah} ${item.NamaPedas ? `🌶️ ${item.NamaPedas}` : ''}<br>@${item.HargaSatuan.toLocaleString()}</div>
+                            <div>Rp ${item.Subtotal.toLocaleString()} <button class="btn-warning" onclick="hapusItemKeranjang(${idx})">✖</button></div>
+                        </div>`;
+                }
             });
             container.innerHTML = html;
             document.getElementById("totalKeranjangDisplay").innerText = `Rp ${total.toLocaleString()}`;
@@ -591,29 +686,24 @@
             }
             modal.innerHTML = `
             <div class="struk-card">
-                <div class="struk-header">
-                    <strong>🍜 SEBLAK SOBA</strong><br>
-                    <small>Warung Pedas Mantap</small>
-                    <div>${dataStruk.Tanggal_Waktu}</div>
-                </div>
+                <div class="struk-header"><strong>🍜 SEBLAK SOBA</strong><br><small>Warung Pedas Mantap</small><div>${dataStruk.Tanggal_Waktu}</div></div>
                 <div class="struk-item"><span>Nomor Struk:</span><span>${dataStruk.Nomor_Struk}</span></div>
                 <div class="struk-item"><span>No Antrian:</span><span><strong>${nomorAntrian}</strong></span></div>
                 <div class="struk-item"><span>Pelanggan:</span><span>${namaPelanggan}</span></div>
                 <div class="struk-item"><span>Layanan:</span><span>${layanan}</span></div>
-                <div style="border-top:1px dashed #fbbf24; margin:8px 0;"></div>
+                <div style="border-top:1px dashed #fbbf24;"></div>
                 ${itemsHtml}
                 <div class="struk-total">
                     <div class="struk-item"><span>TOTAL</span><span>Rp ${dataStruk.Total_Bayar.toLocaleString()}</span></div>
                     <div class="struk-item"><span>Metode Bayar</span><span>${dataStruk.Metode_Bayar}</span></div>
                     <div class="struk-item"><span>Kembalian</span><span>Rp ${dataStruk.Kembalian.toLocaleString()}</span></div>
                 </div>
-                <div style="text-align:center; margin-top:12px; font-size:11px;">Terima kasih! Selamat menikmati.</div>
+                <div style="text-align:center; margin-top:12px;">Terima kasih!</div>
                 <button class="close-struk">Tutup Struk</button>
             </div>
         `;
             document.body.appendChild(modal);
-            modal.querySelector('.close-struk').addEventListener('click', () => modal.remove());
-            modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+            modal.querySelector('.close-struk').onclick = () => modal.remove();
         }
 
         function prosesCheckout() {
@@ -632,86 +722,63 @@
             let idPesanan = generateId("PSN", pesananArr, "ID_Pesanan");
             let layanan = document.getElementById("jenisLayanan").value;
 
-            let newPesanan = {
-                ID_Pesanan: idPesanan,
-                Tanggal: tanggal,
-                Waktu: waktu,
-                Nama_Pelanggan: namaPel,
-                Total_Harga: totalHarga,
-                Layanan: layanan
-            };
+            let newPesanan = { ID_Pesanan: idPesanan, Tanggal: tanggal, Waktu: waktu, Nama_Pelanggan: namaPel, Total_Harga: totalHarga, Layanan: layanan };
             pesananArr.push(newPesanan);
 
             let detailCounter = detailPesananArr.length;
+            let detailItemsUntukStruk = [];
             for (let item of keranjang) {
-                let idDetail = `DTL${(++detailCounter).toString().padStart(3, '0')}`;
-                detailPesananArr.push({
-                    ID_Detail: idDetail,
-                    ID_Pesanan: idPesanan,
-                    ID_Menu: item.ID_Menu,
-                    ID_Variasi: item.ID_Variasi,
-                    ID_Kepedasan: item.ID_Kepedasan,
-                    Jumlah: item.Jumlah,
-                    Harga_Satuan: item.HargaSatuan,
-                    Subtotal: item.Subtotal
-                });
+                if (item.isPackage) {
+                    for (let v of item.variasiList) {
+                        let idDetail = `DTL${(++detailCounter).toString().padStart(3, '0')}`;
+                        detailPesananArr.push({
+                            ID_Detail: idDetail, ID_Pesanan: idPesanan, ID_Menu: "MNU001",
+                            ID_Variasi: v.ID_Variasi, ID_Kepedasan: item.levelPedasId,
+                            Jumlah: item.porsi, Harga_Satuan: v.HargaSatuan, Subtotal: v.SubtotalItem
+                        });
+                    }
+                    detailItemsUntukStruk.push({
+                        NamaVariasi: item.deskripsi,
+                        Jumlah: 1,
+                        NamaPedas: null,
+                        Subtotal: item.Subtotal
+                    });
+                } else {
+                    let idDetail = `DTL${(++detailCounter).toString().padStart(3, '0')}`;
+                    detailPesananArr.push({
+                        ID_Detail: idDetail, ID_Pesanan: idPesanan, ID_Menu: item.ID_Menu,
+                        ID_Variasi: item.ID_Variasi, ID_Kepedasan: item.ID_Kepedasan,
+                        Jumlah: item.Jumlah, Harga_Satuan: item.HargaSatuan, Subtotal: item.Subtotal
+                    });
+                    detailItemsUntukStruk.push({
+                        NamaVariasi: item.NamaVariasi,
+                        Jumlah: item.Jumlah,
+                        NamaPedas: item.NamaPedas,
+                        Subtotal: item.Subtotal
+                    });
+                }
             }
 
             let idTrx = generateId("TRX", transaksiArr, "ID_Transaksi");
             let tglWaktuStr = `${tanggal} ${waktu}`;
-            let newTransaksi = {
-                ID_Transaksi: idTrx,
-                ID_Pesanan: idPesanan,
-                Tanggal_Waktu: tglWaktuStr,
-                Jumlah_Dibayar: jumlahBayar,
-                Metode_Bayar: metode,
-                Status: "Lunas",
-                Kembalian: kembalian
-            };
-            transaksiArr.push(newTransaksi);
+            transaksiArr.push({ ID_Transaksi: idTrx, ID_Pesanan: idPesanan, Tanggal_Waktu: tglWaktuStr, Jumlah_Dibayar: jumlahBayar, Metode_Bayar: metode, Status: "Lunas", Kembalian: kembalian });
 
             let maxAntrianNum = 0;
             antrianArr.forEach(a => { let num = parseInt(a.Nomor_Antrian.substring(1)); if (num > maxAntrianNum) maxAntrianNum = num; });
             let nomorBaru = `A${(maxAntrianNum + 1).toString().padStart(2, '0')}`;
             let idAntrian = generateId("ANT", antrianArr, "ID_Antrian");
-            let newAntrian = {
-                ID_Antrian: idAntrian,
-                ID_Pesanan: idPesanan,
-                Nomor_Antrian: nomorBaru,
-                Waktu_Masuk: waktu,
-                Status_Antrian: "Menunggu",
-                Waktu_Selesai: null
-            };
-            antrianArr.push(newAntrian);
+            antrianArr.push({ ID_Antrian: idAntrian, ID_Pesanan: idPesanan, Nomor_Antrian: nomorBaru, Waktu_Masuk: waktu, Status_Antrian: "Menunggu", Waktu_Selesai: null });
 
             let nomorStruk = generateId("STR", strukArr, "Nomor_Struk");
-            // PERBAIKAN: Total_Bayar pada struk harusnya total harga pesanan (totalHarga), bukan jumlahBayar
-            let newStruk = {
-                Nomor_Struk: nomorStruk,
-                ID_Transaksi: idTrx,
-                ID_Pesanan: idPesanan,
-                Tanggal_Waktu: tglWaktuStr,
-                Total_Bayar: totalHarga,   // <-- perbaikan utama
-                Metode_Bayar: metode,
-                Kembalian: kembalian
-            };
+            let newStruk = { Nomor_Struk: nomorStruk, ID_Transaksi: idTrx, ID_Pesanan: idPesanan, Tanggal_Waktu: tglWaktuStr, Total_Bayar: totalHarga, Metode_Bayar: metode, Kembalian: kembalian };
             strukArr.push(newStruk);
-
-            const detailItemsUntukStruk = keranjang.map(item => ({
-                NamaVariasi: item.NamaVariasi,
-                Jumlah: item.Jumlah,
-                NamaPedas: item.NamaPedas,
-                Subtotal: item.Subtotal
-            }));
 
             keranjang = [];
             renderKeranjang();
             document.getElementById("namaPelanggan").value = "";
             document.getElementById("jumlahBayar").value = "";
             document.getElementById("checkoutMessage").innerHTML = `✅ Pesanan berhasil! Antrian: ${nomorBaru} (${namaPel}) - Total Rp ${totalHarga.toLocaleString()}`;
-
             tampilkanStruk(newStruk, detailItemsUntukStruk, nomorBaru, namaPel, layanan);
-
             setTimeout(() => { document.getElementById("checkoutMessage").innerHTML = ""; }, 4000);
             renderPreviewPesanan();
             refreshKokiView();
@@ -725,7 +792,7 @@
                 return;
             }
             let pesananTerbaru = [...pesananArr].reverse().slice(0, 5);
-            let html = `<table><thead><tr><th>ID Pesanan</th><th>Pelanggan</th><th>Total</th><th>Waktu</th><th>Layanan</th></tr></thead><tbody>`;
+            let html = `<table><thead><th>ID Pesanan</th><th>Pelanggan</th><th>Total</th><th>Waktu</th><th>Layanan</th></tr></thead><tbody>`;
             for (let p of pesananTerbaru) {
                 html += `<tr>
                         <td>${p.ID_Pesanan}</td>
@@ -746,45 +813,73 @@
                 container.innerHTML = "<div style='padding: 1rem; text-align:center;'>✨ Semua pesanan sudah selesai ✨</div>";
                 return;
             }
-            let html = `<table><thead><tr><th>No Antrian</th><th>Pelanggan</th><th>Detail Pesanan</th><th>Status</th><th>Aksi</th></tr></thead><tbody>`;
+            let html = `<table><thead><th>No Antrian</th><th>Pelanggan</th><th>Detail Pesanan</th><th>Status</th><th>Aksi</th></tr></thead><tbody>`;
             for (let ant of antrianBelumSelesai) {
                 let pesanan = pesananArr.find(p => p.ID_Pesanan === ant.ID_Pesanan);
                 let namaPel = pesanan ? pesanan.Nama_Pelanggan : "Unknown";
                 let details = detailPesananArr.filter(d => d.ID_Pesanan === ant.ID_Pesanan);
-                let detailText = "";
+
+                let groupMap = new Map();
                 for (let det of details) {
                     let variasi = variasiMenu.find(v => v.ID_Variasi === det.ID_Variasi);
-                    let namaVar = variasi ? variasi.Nama_Variasi : "Menu";
-                    let level = "";
-                    if (det.ID_Kepedasan) {
-                        let lvl = tingkatPedas.find(l => l.ID_Kepedasan === det.ID_Kepedasan);
-                        level = lvl ? ` (${lvl.Nama_Level})` : "";
+                    if (!variasi) continue;
+                    let key = det.ID_Menu === "MNU001" ? `seblak_${det.ID_Kepedasan || "null"}` : `minuman_${det.ID_Variasi}`;
+                    if (!groupMap.has(key)) {
+                        groupMap.set(key, {
+                            isPackage: det.ID_Menu === "MNU001",
+                            items: [],
+                            levelPedasId: det.ID_Kepedasan,
+                            jumlahPorsi: 0
+                        });
                     }
-                    detailText += `${namaVar} x${det.Jumlah}${level}<br>`;
+                    let group = groupMap.get(key);
+                    group.items.push({ nama: variasi.Nama_Variasi, jumlah: det.Jumlah });
+                    group.jumlahPorsi = det.Jumlah;
+                }
+                let detailText = "";
+                for (let [_, group] of groupMap.entries()) {
+                    if (group.isPackage && group.items.length > 1) {
+                        let namaVariasiList = group.items.map(i => i.nama).join(', ');
+                        let levelPedasNama = "";
+                        if (group.levelPedasId) {
+                            let lvl = tingkatPedas.find(l => l.ID_Kepedasan === group.levelPedasId);
+                            levelPedasNama = lvl ? lvl.Nama_Level : "";
+                        }
+                        detailText += `📦 Seblak Paket (${namaVariasiList}) x${group.jumlahPorsi} porsi - Pedas: ${levelPedasNama}<br>`;
+                    } else {
+                        for (let item of group.items) {
+                            let levelPedasNama = "";
+                            if (group.levelPedasId) {
+                                let lvl = tingkatPedas.find(l => l.ID_Kepedasan === group.levelPedasId);
+                                levelPedasNama = lvl ? ` (${lvl.Nama_Level})` : "";
+                            }
+                            detailText += `• ${item.nama} x${item.jumlah}${levelPedasNama}<br>`;
+                        }
+                    }
                 }
                 html += `<tr>
                         <td><span class="badge">🎫 ${ant.Nomor_Antrian}</span></td>
                         <td>${namaPel}</td>
-                        <td>${detailText}</td>
+                        <td>${detailText || '-'}</td>
                         <td>⏳ ${ant.Status_Antrian}</td>
                         <td><button class="btn-warning" onclick="selesaikanPesanan('${ant.ID_Antrian}')">✅ Selesai</button></td>
                     </tr>`;
             }
-            html += `</tbody></table>`;
+            html += `</tbody><tr>`;
             container.innerHTML = html;
         }
 
         window.selesaikanPesanan = function (idAntrian) {
-            let antrianIdx = antrianArr.findIndex(a => a.ID_Antrian === idAntrian);
-            if (antrianIdx !== -1 && antrianArr[antrianIdx].Status_Antrian !== "Selesai") {
-                antrianArr[antrianIdx].Status_Antrian = "Selesai";
+            let idx = antrianArr.findIndex(a => a.ID_Antrian === idAntrian);
+            if (idx !== -1 && antrianArr[idx].Status_Antrian !== "Selesai") {
+                antrianArr[idx].Status_Antrian = "Selesai";
                 let now = new Date();
-                antrianArr[antrianIdx].Waktu_Selesai = `${now.getHours()}:${now.getMinutes()}`;
+                antrianArr[idx].Waktu_Selesai = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
                 refreshKokiView();
                 renderPreviewPesanan();
                 alert("Pesanan telah selesai & diserahkan ke pelanggan!");
             }
-        }
+        };
 
         function generateLaporan() {
             let tglInput = document.getElementById("tanggalLaporan").value;
@@ -806,8 +901,9 @@
                 for (let det of details) {
                     let variasi = variasiMenu.find(v => v.ID_Variasi === det.ID_Variasi);
                     if (variasi) {
-                        let nama = variasi.Nama_Variasi;
-                        if (!mapVariasi.has(det.ID_Variasi)) mapVariasi.set(det.ID_Variasi, { nama, jumlah: 0, pendapatan: 0 });
+                        if (!mapVariasi.has(det.ID_Variasi)) {
+                            mapVariasi.set(det.ID_Variasi, { nama: variasi.Nama_Variasi, jumlah: 0, pendapatan: 0 });
+                        }
                         let data = mapVariasi.get(det.ID_Variasi);
                         data.jumlah += det.Jumlah;
                         data.pendapatan += det.Subtotal;
@@ -815,8 +911,8 @@
                 }
             }
             let rincianArray = [];
-            let rincianHtml = `<table><thead><tr><th>Menu Variasi</th><th>Jumlah Terjual</th><th>Pendapatan</th></tr></thead><tbody>`;
-            for (let [id, val] of mapVariasi.entries()) {
+            let rincianHtml = `<table><thead><th>Menu Variasi</th><th>Jumlah Terjual</th><th>Pendapatan</th></tr></thead><tbody>`;
+            for (let [_, val] of mapVariasi.entries()) {
                 rincianHtml += `<tr><td>${val.nama}</td><td>${val.jumlah}</td><td>Rp ${val.pendapatan.toLocaleString()}</td></tr>`;
                 rincianArray.push({ nama: val.nama, jumlah: val.jumlah, pendapatan: val.pendapatan });
             }
@@ -828,11 +924,7 @@
                 <hr>${rincianHtml}
             </div>
         `;
-            lastLaporanData = {
-                tanggal: tglInput,
-                totalPenjualan: totalPenjualan,
-                rincian: rincianArray
-            };
+            lastLaporanData = { tanggal: tglInput, totalPenjualan: totalPenjualan, rincian: rincianArray };
         }
 
         function downloadLaporan() {
@@ -862,10 +954,11 @@
         // Event binding & init
         document.getElementById("kategoriMenu").addEventListener("change", updateVariasiSelect);
         document.getElementById("tambahKeranjangBtn").addEventListener("click", tambahKeKeranjang);
+        document.getElementById("btnTambahPaket").addEventListener("click", bukaModalPaket);
         document.getElementById("prosesCheckoutBtn").addEventListener("click", prosesCheckout);
-        document.getElementById("refreshKoki")?.addEventListener("click", refreshKokiView);
-        document.getElementById("generateLaporanBtn")?.addEventListener("click", generateLaporan);
-        document.getElementById("downloadLaporanBtn")?.addEventListener("click", downloadLaporan);
+        document.getElementById("refreshKoki").addEventListener("click", refreshKokiView);
+        document.getElementById("generateLaporanBtn").addEventListener("click", generateLaporan);
+        document.getElementById("downloadLaporanBtn").addEventListener("click", downloadLaporan);
         updateVariasiSelect();
         renderKeranjang();
         renderPreviewPesanan();
@@ -884,7 +977,7 @@
                 if (tabId === 'owner') generateLaporan();
             });
         });
-        setTimeout(() => { if (document.getElementById("owner").classList.contains("active")) generateLaporan(); }, 100);
+        if (document.getElementById("owner").classList.contains("active")) generateLaporan();
     </script>
 </body>
 
