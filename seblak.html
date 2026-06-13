@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Sistem Manajemen Warung Seblak Soba</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #fef3c7 0%, #fee2e2 100%);
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+        }
+
+        /* container utama */
+        .app-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            backdrop-filter: blur(2px);
+        }
+
+        /* header merah-kuning khas warung */
+        .hero-header {
+            background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%);
+            padding: 1.8rem 2rem;
+            text-align: center;
+            border-bottom: 6px solid #fbbf24;
+        }
+
+        .hero-header h1 {
+            font-size: 2.4rem;
+            letter-spacing: 2px;
+            font-weight: 800;
+            color: #fffbeb;
+            text-shadow: 4px 4px 0 #991b1b;
+            word-break: keep-all;
+        }
+
+        .hero-header .sub {
+            font-size: 1rem;
+            color: #fde68a;
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+
+        .team-names {
+            background: #fef9e3;
+            padding: 0.6rem 1rem;
+            text-align: center;
+            font-weight: 600;
+            color: #b91c1c;
+            border-bottom: 1px dashed #fcd34d;
+            font-size: 0.9rem;
+        }
+
+        .team-names span {
+            background: #ffedd5;
+            padding: 0.2rem 0.8rem;
+            border-radius: 40px;
+            margin: 0 0.2rem;
+            display: inline-block;
+        }
+
+        /* tab navigasi */
+        .tab-nav {
+            display: flex;
+            background: #fff2df;
+            border-bottom: 2px solid #fbbf24;
+            gap: 0.5rem;
+            padding: 0.8rem 1.5rem 0 1.5rem;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 0.8rem 1.8rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 2rem 2rem 0 0;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #7c2d12;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn i {
+            font-style: normal;
+            font-weight: bold;
+        }
+
+        .tab-btn.active {
+            background: #fbbf24;
+            color: #7c2d12;
+            box-shadow: 0 -2px 0 #b91c1c;
+        }
+
+        .tab-btn:not(.active):hover {
+            background: #fed7aa;
+        }
+
+        /* konten */
+        .tab-content {
+            display: none;
+            padding: 2rem;
+            animation: fade 0.2s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* kartu & grid */
+        .card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.4rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid #ffe0b5;
+            margin-bottom: 2rem;
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            border-left: 8px solid #dc2626;
+            padding-left: 1rem;
+            margin-bottom: 1.2rem;
+            color: #431407;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            width: 130px;
+            color: #7c2d12;
+        }
+
+        input,
+        select,
+        button {
+            padding: 0.6rem 1rem;
+            border-radius: 40px;
+            border: 1px solid #fcd34d;
+            background: #fffaf2;
+            font-weight: 500;
+        }
+
+        button {
+            background: #b91c1c;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: bold;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        button:hover {
+            background: #991b1b;
+            transform: scale(0.97);
+        }
+
+        .btn-warning {
+            background: #f59e0b;
+            color: #2d1b0c;
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        th,
+        td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #fee2c2;
+            text-align: left;
+        }
+
+        th {
+            background: #fef3c7;
+            color: #991b1b;
+        }
+
+        .badge {
+            background: #fde68a;
+            padding: 0.2rem 0.7rem;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+
+        .keranjang-item {
+            background: #fef9e6;
+            margin: 0.5rem 0;
+            padding: 0.6rem;
+            border-radius: 1rem;
+        }
+
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .total-bayar {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #b91c1c;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.2rem;
+        }
+
+        /* style struk modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .struk-card {
+            background: #fffef7;
+            max-width: 400px;
+            width: 90%;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            border-left: 10px solid #dc2626;
+            box-shadow: 0 20px 30px black;
+            font-family: monospace;
+        }
+
+        .struk-header {
+            text-align: center;
+            border-bottom: 1px dashed #fbbf24;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+        }
+
+        .struk-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            margin: 0.3rem 0;
+        }
+
+        .struk-total {
+            border-top: 1px solid #f59e0b;
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            font-weight: bold;
+        }
+
+        .close-struk {
+            background: #b91c1c;
+            margin-top: 1rem;
+            width: 100%;
+        }
+
+        @media (max-width: 720px) {
+            body {
+                padding: 1rem;
+            }
+
+            .tab-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <div class="hero-header">
+            <h1>🍜 SISTEM WARUNG SEBLAK SOBA 🔥</h1>
+            <div class="sub">Pedasnya Nagih, Manajemennya Modern!</div>
+        </div>
+        <div class="team-names">
+            🧑‍🍳 Kelompok 1 :
+            <span>Nadzral</span> <span>Gefira</span> <span>Chandra</span> <span>Dede Hidayat</span>
+            <span>Raihan</span>
+        </div>
+
+        <div class="tab-nav">
+            <button class="tab-btn active" data-tab="kasir">💰 KASIR · Input Pesanan</button>
+            <button class="tab-btn" data-tab="koki">👨‍🍳 KOKI · Antrian & Masak</button>
+            <button class="tab-btn" data-tab="owner">📊 OWNER · Laporan Penjualan</button>
+        </div>
+
+        <!-- KASIR PANEL -->
+        <div id="kasir" class="tab-content active">
+            <div class="card">
+                <div class="card-title">📝 Form Pesanan Baru</div>
+                <div class="form-group">
+                    <label>Nama Pelanggan :</label>
+                    <input type="text" id="namaPelanggan" placeholder="Masukkan Nama Pelanggan" style="flex:2">
+                </div>
+                <div class="form-group">
+                    <label>Jenis Layanan :</label>
+                    <select id="jenisLayanan">
+                        <option value="Dine In">🍽️ Makan di Tempat</option>
+                        <option value="Take Away">🥡 Bawa Pulang</option>
+                    </select>
+                </div>
+                <hr style="margin: 0.5rem 0; border-color:#ffe0b0;">
+                <div class="flex-between" style="margin-bottom: 0.5rem;">
+                    <strong>➕ Tambah Item ke Pesanan</strong>
+                    <small style="color:#b45309;">*Klik tambah untuk keranjang</small>
+                </div>
+                <div class="grid-2">
+                    <div>
+                        <label>Kategori Menu :</label>
+                        <select id="kategoriMenu">
+                            <option value="MNU001">🍲 Seblak Soba</option>
+                            <option value="MNU002">🥤 Minuman</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Pilih Variasi :</label>
+                        <select id="variasiSelect"></select>
+                    </div>
+                    <div>
+                        <label>Jumlah :</label>
+                        <input type="number" id="jumlahItem" value="1" min="1" style="width:90px">
+                    </div>
+                    <div>
+                        <label>Tingkat Pedas :</label>
+                        <select id="levelPedasSelect">
+                            <option value="KPD002">Pedas Sedang 🌶️🌶️</option>
+                            <option value="KPD001">Tidak Pedas</option>
+                            <option value="KPD003">Sangat Pedas 🌶️🌶️🌶️</option>
+                            <option value="KPD004">Ekstra Pedas 🔥🔥🔥</option>
+                        </select>
+                        <small id="pedasInfoNote" style="display:block; font-size:11px;">(Hanya untuk Seblak)</small>
+                    </div>
+                    <div style="display:flex; align-items:end;">
+                        <button id="tambahKeranjangBtn" style="background:#ca8a04;">➕ Tambah ke Keranjang</button>
+                    </div>
+                </div>
+                <hr style="margin: 1rem 0;">
+                <div><strong>🛒 Keranjang Belanja</strong> <span id="jumlahItemKeranjang">0</span> item</div>
+                <div id="keranjangList" style="max-height: 280px; overflow-y: auto; margin: 1rem 0;"></div>
+                <div class="flex-between">
+                    <span><strong>Total Pesanan :</strong></span>
+                    <span class="total-bayar" id="totalKeranjangDisplay">Rp 0</span>
+                </div>
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label>Metode Bayar :</label>
+                    <select id="metodeBayar">
+                        <option value="Tunai">💵 Tunai</option>
+                        <option value="Qris">📱 QRIS</option>
+                    </select>
+                    <label>Jumlah Dibayar :</label>
+                    <input type="number" id="jumlahBayar" placeholder="0" style="width:140px">
+                    <button id="prosesCheckoutBtn" style="background:#b91c1c;">✅ Proses & Cetak Antrian</button>
+                </div>
+                <div id="checkoutMessage" style="margin-top: 8px; font-weight: 500;"></div>
+            </div>
+            <!-- data pesanan terbaru (preview) -->
+            <div class="card">
+                <div class="card-title">📋 Pesanan Terakhir / Aktif</div>
+                <div id="pesananTerbaruPreview">Memuat data...</div>
+            </div>
+        </div>
+
+        <!-- KOKI PANEL -->
+        <div id="koki" class="tab-content">
+            <div class="card">
+                <div class="card-title">👨‍🍳 Antrian Dapur - Status Masakan</div>
+                <div id="antrianKokiList" style="overflow-x:auto;">
+                    Tabel antrian akan muncul disini.
+                </div>
+                <button id="refreshKoki" class="btn-warning" style="margin-top:1rem;">🔄 Refresh Antrian</button>
+            </div>
+        </div>
+
+        <!-- OWNER PANEL -->
+        <div id="owner" class="tab-content">
+            <div class="card">
+                <div class="card-title">📈 Laporan Keuangan & Penjualan</div>
+                <div class="form-group">
+                    <label>Pilih Tanggal Laporan :</label>
+                    <input type="date" id="tanggalLaporan" value="2025-06-01">
+                    <button id="generateLaporanBtn">Tampilkan Laporan</button>
+                </div>
+                <div id="laporanHasil">
+                    <p>Silakan pilih tanggal untuk melihat total pendapatan dan rincian menu terjual.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ---------- DATA MASTER ----------
+        const variasiMenu = [
+            { ID_Variasi: "VAR001", ID_Menu: "MNU001", Nama_Variasi: "Ceker", Harga: 4000 },
+            { ID_Variasi: "VAR002", ID_Menu: "MNU001", Nama_Variasi: "Sosis", Harga: 2000 },
+            { ID_Variasi: "VAR003", ID_Menu: "MNU001", Nama_Variasi: "Kerupuk", Harga: 1000 },
+            { ID_Variasi: "VAR004", ID_Menu: "MNU001", Nama_Variasi: "Dumpling", Harga: 3000 },
+            { ID_Variasi: "VAR005", ID_Menu: "MNU002", Nama_Variasi: "Teh", Harga: 5000 },
+            { ID_Variasi: "VAR006", ID_Menu: "MNU002", Nama_Variasi: "Es Jeruk", Harga: 7000 },
+            { ID_Variasi: "VAR007", ID_Menu: "MNU002", Nama_Variasi: "Es Matcha", Harga: 6000 },
+            { ID_Variasi: "VAR008", ID_Menu: "MNU002", Nama_Variasi: "Kopi", Harga: 3000 }
+        ];
+
+        const tingkatPedas = [
+            { ID_Kepedasan: "KPD001", Nama_Level: "Tidak Pedas", Skala: 1 },
+            { ID_Kepedasan: "KPD002", Nama_Level: "Pedas Sedang", Skala: 2 },
+            { ID_Kepedasan: "KPD003", Nama_Level: "Sangat Pedas", Skala: 3 },
+            { ID_Kepedasan: "KPD004", Nama_Level: "Ekstra Pedas", Skala: 4 }
+        ];
+
+        // Data inti sistem
+        let pesananArr = [];        // {ID_Pesanan, Tanggal, Waktu, Nama_Pelanggan, Total_Harga, Layanan}
+        let detailPesananArr = [];  // {ID_Detail, ID_Pesanan, ID_Menu, ID_Variasi, ID_Kepedasan, Jumlah, Harga_Satuan, Subtotal}
+        let antrianArr = [];        // {ID_Antrian, ID_Pesanan, Nomor_Antrian, Waktu_Masuk, Status_Antrian, Waktu_Selesai}
+        let transaksiArr = [];      // {ID_Transaksi, ID_Pesanan, Tanggal_Waktu, Jumlah_Dibayar, Metode_Bayar, Status, Kembalian}
+        let strukArr = [];          // Untuk menyimpan data struk sesuai ERD (Nomor_Struk, ID_Transaksi, ID_Pesanan, Tanggal_Waktu, Total_Bayar, Metode_Bayar, Kembalian)
+
+        // Helper ID Generator
+        function generateId(prefix, arr, field) {
+            let max = 0;
+            for (let item of arr) {
+                let num = parseInt(item[field].replace(prefix, '')) || 0;
+                if (num > max) max = num;
+            }
+            let next = (max + 1).toString().padStart(3, '0');
+            return prefix + next;
+        }
+
+        // Format waktu lokal
+        function getCurrentDateTime() {
+            let now = new Date();
+            let tanggal = `${now.getDate().toString().padStart(2, '0')}/${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getFullYear()}`;
+            let waktu = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            return { tanggal, waktu, full: now };
+        }
+
+        // Inisialisasi data contoh dari soal
+        function initContohData() {
+            pesananArr = [
+                { ID_Pesanan: "PSN001", Tanggal: "01/06/2025", Waktu: "10:30", Nama_Pelanggan: "Ihsan", Total_Harga: 9000, Layanan: "Dine In" },
+                { ID_Pesanan: "PSN002", Tanggal: "01/06/2025", Waktu: "11:30", Nama_Pelanggan: "Rafi", Total_Harga: 5000, Layanan: "Take Away" }
+            ];
+            detailPesananArr = [
+                { ID_Detail: "DTL001", ID_Pesanan: "PSN001", ID_Menu: "MNU001", ID_Variasi: "VAR001", ID_Kepedasan: "KPD001", Jumlah: 1, Harga_Satuan: 4000, Subtotal: 4000 },
+                { ID_Detail: "DTL002", ID_Pesanan: "PSN001", ID_Menu: "MNU002", ID_Variasi: "VAR005", ID_Kepedasan: null, Jumlah: 1, Harga_Satuan: 5000, Subtotal: 5000 },
+                { ID_Detail: "DTL003", ID_Pesanan: "PSN002", ID_Menu: "MNU001", ID_Variasi: "VAR003", ID_Kepedasan: "KPD003", Jumlah: 5, Harga_Satuan: 1000, Subtotal: 5000 }
+            ];
+            antrianArr = [
+                { ID_Antrian: "ANT001", ID_Pesanan: "PSN001", Nomor_Antrian: "A01", Waktu_Masuk: "10:30", Status_Antrian: "Selesai", Waktu_Selesai: "10:55" },
+                { ID_Antrian: "ANT002", ID_Pesanan: "PSN002", Nomor_Antrian: "A02", Waktu_Masuk: "11:30", Status_Antrian: "Selesai", Waktu_Selesai: "11:55" }
+            ];
+            transaksiArr = [
+                { ID_Transaksi: "TRX001", ID_Pesanan: "PSN001", Tanggal_Waktu: "01/06/2025 10:30", Jumlah_Dibayar: 10000, Metode_Bayar: "Tunai", Status: "Lunas", Kembalian: 1000 },
+                { ID_Transaksi: "TRX002", ID_Pesanan: "PSN002", Tanggal_Waktu: "01/06/2025 11:30", Jumlah_Dibayar: 5000, Metode_Bayar: "Qris", Status: "Lunas", Kembalian: 0 }
+            ];
+            strukArr = [
+                { Nomor_Struk: "STR001", ID_Transaksi: "TRX001", ID_Pesanan: "PSN001", Tanggal_Waktu: "01/06/2025 10:30", Total_Bayar: 10000, Metode_Bayar: "Tunai", Kembalian: 1000 },
+                { Nomor_Struk: "STR002", ID_Transaksi: "TRX002", ID_Pesanan: "PSN002", Tanggal_Waktu: "01/06/2025 11:30", Total_Bayar: 5000, Metode_Bayar: "Qris", Kembalian: 0 }
+            ];
+        }
+        initContohData();
+
+        // Keranjang sementara untuk kasir
+        let keranjang = []; // { ID_Menu, ID_Variasi, NamaVariasi, HargaSatuan, Jumlah, ID_Kepedasan, NamaPedas, Subtotal }
+        let currentNamaPelanggan = "";
+        let currentLayanan = "Dine In";
+
+        // Render variasi berdasarkan kategori menu
+        function updateVariasiSelect() {
+            let kategori = document.getElementById("kategoriMenu").value;
+            let filtered = variasiMenu.filter(v => v.ID_Menu === kategori);
+            let select = document.getElementById("variasiSelect");
+            select.innerHTML = "";
+            filtered.forEach(v => {
+                let opt = document.createElement("option");
+                opt.value = v.ID_Variasi;
+                opt.innerText = `${v.Nama_Variasi} - Rp ${v.Harga.toLocaleString()}`;
+                select.appendChild(opt);
+            });
+            const isSeblak = (kategori === "MNU001");
+            document.getElementById("levelPedasSelect").disabled = !isSeblak;
+            document.getElementById("pedasInfoNote").style.opacity = isSeblak ? "1" : "0.5";
+        }
+
+        // tambah keranjang
+        function tambahKeKeranjang() {
+            let kategoriMenu = document.getElementById("kategoriMenu").value;
+            let idVariasi = document.getElementById("variasiSelect").value;
+            let jumlah = parseInt(document.getElementById("jumlahItem").value);
+            if (isNaN(jumlah) || jumlah < 1) jumlah = 1;
+            let variasi = variasiMenu.find(v => v.ID_Variasi === idVariasi);
+            if (!variasi) return;
+            let idKepedasan = document.getElementById("levelPedasSelect").value;
+            let levelObj = tingkatPedas.find(l => l.ID_Kepedasan === idKepedasan);
+            let namaPedas = levelObj ? levelObj.Nama_Level : "-";
+            if (kategoriMenu !== "MNU001") idKepedasan = null;
+            let subtotal = variasi.Harga * jumlah;
+            keranjang.push({
+                ID_Menu: variasi.ID_Menu,
+                ID_Variasi: variasi.ID_Variasi,
+                NamaVariasi: variasi.Nama_Variasi,
+                HargaSatuan: variasi.Harga,
+                Jumlah: jumlah,
+                ID_Kepedasan: idKepedasan,
+                NamaPedas: (kategoriMenu === "MNU001" ? namaPedas : null),
+                Subtotal: subtotal
+            });
+            renderKeranjang();
+        }
+
+        function renderKeranjang() {
+            const container = document.getElementById("keranjangList");
+            if (!container) return;
+            if (keranjang.length === 0) {
+                container.innerHTML = "<div style='padding:1rem; text-align:center;'>Keranjang kosong, tambahkan menu.</div>";
+                document.getElementById("totalKeranjangDisplay").innerText = "Rp 0";
+                document.getElementById("jumlahItemKeranjang").innerText = "0";
+                return;
+            }
+            let html = "";
+            let total = 0;
+            keranjang.forEach((item, idx) => {
+                total += item.Subtotal;
+                html += `<div class="keranjang-item flex-between">
+                        <div><strong>${item.NamaVariasi}</strong> x${item.Jumlah} ${item.NamaPedas ? `🌶️ ${item.NamaPedas}` : ''}<br>@${item.HargaSatuan.toLocaleString()}</div>
+                        <div>Rp ${item.Subtotal.toLocaleString()} <button class="btn-warning" style="padding:2px 8px;" onclick="hapusItemKeranjang(${idx})">✖</button></div>
+                    </div>`;
+            });
+            container.innerHTML = html;
+            document.getElementById("totalKeranjangDisplay").innerText = `Rp ${total.toLocaleString()}`;
+            document.getElementById("jumlahItemKeranjang").innerText = keranjang.length;
+        }
+
+        window.hapusItemKeranjang = function (idx) {
+            keranjang.splice(idx, 1);
+            renderKeranjang();
+        }
+
+        // Fungsi menampilkan struk (modal)
+        function tampilkanStruk(dataStruk, detailItems, nomorAntrian, namaPelanggan, layanan) {
+            // Buat overlay modal
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            let itemsHtml = '';
+            for (let item of detailItems) {
+                let pedasTxt = item.NamaPedas ? ` (${item.NamaPedas})` : '';
+                itemsHtml += `<div class="struk-item"><span>${item.NamaVariasi} x${item.Jumlah}${pedasTxt}</span><span>Rp ${item.Subtotal.toLocaleString()}</span></div>`;
+            }
+            modal.innerHTML = `
+            <div class="struk-card">
+                <div class="struk-header">
+                    <strong>🍜 SEBLAK SOBA</strong><br>
+                    <small>Warung Pedas Mantap</small>
+                    <div>${dataStruk.Tanggal_Waktu}</div>
+                </div>
+                <div class="struk-item"><span>Nomor Struk:</span><span>${dataStruk.Nomor_Struk}</span></div>
+                <div class="struk-item"><span>No Antrian:</span><span><strong>${nomorAntrian}</strong></span></div>
+                <div class="struk-item"><span>Pelanggan:</span><span>${namaPelanggan}</span></div>
+                <div class="struk-item"><span>Layanan:</span><span>${layanan}</span></div>
+                <div style="border-top:1px dashed #fbbf24; margin:8px 0;"></div>
+                ${itemsHtml}
+                <div class="struk-total">
+                    <div class="struk-item"><span>TOTAL</span><span>Rp ${dataStruk.Total_Bayar.toLocaleString()}</span></div>
+                    <div class="struk-item"><span>Metode Bayar</span><span>${dataStruk.Metode_Bayar}</span></div>
+                    <div class="struk-item"><span>Kembalian</span><span>Rp ${dataStruk.Kembalian.toLocaleString()}</span></div>
+                </div>
+                <div style="text-align:center; margin-top:12px; font-size:11px;">Terima kasih! Selamat menikmati.</div>
+                <button class="close-struk">Tutup Struk</button>
+            </div>
+        `;
+            document.body.appendChild(modal);
+            modal.querySelector('.close-struk').addEventListener('click', () => modal.remove());
+            modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+        }
+
+        // Proses checkout: simpan pesanan, transaksi, antrian, dan cetak struk
+        function prosesCheckout() {
+            let namaPel = document.getElementById("namaPelanggan").value.trim();
+            if (namaPel === "") { alert("Masukkan nama pelanggan!"); return; }
+            if (keranjang.length === 0) { alert("Keranjang masih kosong!"); return; }
+            let totalHarga = keranjang.reduce((sum, i) => sum + i.Subtotal, 0);
+            let metode = document.getElementById("metodeBayar").value;
+            let jumlahBayar = parseInt(document.getElementById("jumlahBayar").value);
+            if (isNaN(jumlahBayar) || jumlahBayar < totalHarga) {
+                alert(`Jumlah bayar kurang! Total belanja Rp ${totalHarga.toLocaleString()}`);
+                return;
+            }
+            let kembalian = jumlahBayar - totalHarga;
+            const { tanggal, waktu, full } = getCurrentDateTime();
+            let idPesanan = generateId("PSN", pesananArr, "ID_Pesanan");
+            let layanan = document.getElementById("jenisLayanan").value;
+            // simpan pesanan
+            let newPesanan = {
+                ID_Pesanan: idPesanan,
+                Tanggal: tanggal,
+                Waktu: waktu,
+                Nama_Pelanggan: namaPel,
+                Total_Harga: totalHarga,
+                Layanan: layanan
+            };
+            pesananArr.push(newPesanan);
+            // simpan detail
+            let detailCounter = detailPesananArr.length;
+            for (let item of keranjang) {
+                let idDetail = `DTL${(++detailCounter).toString().padStart(3, '0')}`;
+                detailPesananArr.push({
+                    ID_Detail: idDetail,
+                    ID_Pesanan: idPesanan,
+                    ID_Menu: item.ID_Menu,
+                    ID_Variasi: item.ID_Variasi,
+                    ID_Kepedasan: item.ID_Kepedasan,
+                    Jumlah: item.Jumlah,
+                    Harga_Satuan: item.HargaSatuan,
+                    Subtotal: item.Subtotal
+                });
+            }
+            // transaksi
+            let idTrx = generateId("TRX", transaksiArr, "ID_Transaksi");
+            let tglWaktuStr = `${tanggal} ${waktu}`;
+            let newTransaksi = {
+                ID_Transaksi: idTrx,
+                ID_Pesanan: idPesanan,
+                Tanggal_Waktu: tglWaktuStr,
+                Jumlah_Dibayar: jumlahBayar,
+                Metode_Bayar: metode,
+                Status: "Lunas",
+                Kembalian: kembalian
+            };
+            transaksiArr.push(newTransaksi);
+            // antrian
+            let maxAntrianNum = 0;
+            antrianArr.forEach(a => { let num = parseInt(a.Nomor_Antrian.substring(1)); if (num > maxAntrianNum) maxAntrianNum = num; });
+            let nomorBaru = `A${(maxAntrianNum + 1).toString().padStart(2, '0')}`;
+            let idAntrian = generateId("ANT", antrianArr, "ID_Antrian");
+            let newAntrian = {
+                ID_Antrian: idAntrian,
+                ID_Pesanan: idPesanan,
+                Nomor_Antrian: nomorBaru,
+                Waktu_Masuk: waktu,
+                Status_Antrian: "Menunggu",
+                Waktu_Selesai: null
+            };
+            antrianArr.push(newAntrian);
+            // struk
+            let nomorStruk = generateId("STR", strukArr, "Nomor_Struk");
+            let newStruk = {
+                Nomor_Struk: nomorStruk,
+                ID_Transaksi: idTrx,
+                ID_Pesanan: idPesanan,
+                Tanggal_Waktu: tglWaktuStr,
+                Total_Bayar: jumlahBayar,
+                Metode_Bayar: metode,
+                Kembalian: kembalian
+            };
+            strukArr.push(newStruk);
+
+            // Simpan salinan detail items untuk struk
+            const detailItemsUntukStruk = keranjang.map(item => ({
+                NamaVariasi: item.NamaVariasi,
+                Jumlah: item.Jumlah,
+                NamaPedas: item.NamaPedas,
+                Subtotal: item.Subtotal
+            }));
+
+            // kosongkan keranjang dan form
+            keranjang = [];
+            renderKeranjang();
+            document.getElementById("namaPelanggan").value = "";
+            document.getElementById("jumlahBayar").value = "";
+            document.getElementById("checkoutMessage").innerHTML = `✅ Pesanan berhasil! Antrian: ${nomorBaru} (${namaPel}) - Total Rp ${totalHarga.toLocaleString()}`;
+
+            // TAMPILKAN STRUK SESUAI ERD
+            tampilkanStruk(newStruk, detailItemsUntukStruk, nomorBaru, namaPel, layanan);
+
+            setTimeout(() => { document.getElementById("checkoutMessage").innerHTML = ""; }, 4000);
+            renderPreviewPesanan();
+            refreshKokiView();
+        }
+
+        function renderPreviewPesanan() {
+            let container = document.getElementById("pesananTerbaruPreview");
+            if (!container) return;
+            if (pesananArr.length === 0) { container.innerHTML = "<i>Belum ada pesanan</i>"; return; }
+            let html = `<table><thead><tr><th>ID Pesanan</th><th>Pelanggan</th><th>Total</th><th>Waktu</th></tr></thead><tbody>`;
+            pesananArr.slice(-4).forEach(p => {
+                html += `<tr><td>${p.ID_Pesanan}</td><td>${p.Nama_Pelanggan}</td><td>Rp ${p.Total_Harga.toLocaleString()}</td><td>${p.Waktu}</td></tr>`;
+            });
+            html += `</tbody></table>`;
+            container.innerHTML = html;
+        }
+
+        // KOKI : tampilkan antrian yang belum selesai (status Menunggu)
+        function refreshKokiView() {
+            const container = document.getElementById("antrianKokiList");
+            let antrianBelumSelesai = antrianArr.filter(a => a.Status_Antrian !== "Selesai");
+            if (antrianBelumSelesai.length === 0) {
+                container.innerHTML = "<div style='padding: 1rem; text-align:center;'>✨ Semua pesanan sudah selesai ✨</div>";
+                return;
+            }
+            let html = `<table><thead><tr><th>No Antrian</th><th>Pelanggan</th><th>Detail Pesanan</th><th>Status</th><th>Aksi</th></tr></thead><tbody>`;
+            for (let ant of antrianBelumSelesai) {
+                let pesanan = pesananArr.find(p => p.ID_Pesanan === ant.ID_Pesanan);
+                let namaPel = pesanan ? pesanan.Nama_Pelanggan : "Unknown";
+                let details = detailPesananArr.filter(d => d.ID_Pesanan === ant.ID_Pesanan);
+                let detailText = "";
+                for (let det of details) {
+                    let variasi = variasiMenu.find(v => v.ID_Variasi === det.ID_Variasi);
+                    let namaVar = variasi ? variasi.Nama_Variasi : "Menu";
+                    let level = "";
+                    if (det.ID_Kepedasan) {
+                        let lvl = tingkatPedas.find(l => l.ID_Kepedasan === det.ID_Kepedasan);
+                        level = lvl ? ` (${lvl.Nama_Level})` : "";
+                    }
+                    detailText += `${namaVar} x${det.Jumlah}${level}<br>`;
+                }
+                html += `<tr>
+                        <td><span class="badge">🎫 ${ant.Nomor_Antrian}</span></td>
+                        <td>${namaPel}</td>
+                        <td>${detailText}</td>
+                        <td>⏳ ${ant.Status_Antrian}</td>
+                        <td><button class="btn-warning" onclick="selesaikanPesanan('${ant.ID_Antrian}')">✅ Selesai</button></td>
+                    </tr>`;
+            }
+            html += `</tbody></table>`;
+            container.innerHTML = html;
+        }
+
+        window.selesaikanPesanan = function (idAntrian) {
+            let antrianIdx = antrianArr.findIndex(a => a.ID_Antrian === idAntrian);
+            if (antrianIdx !== -1 && antrianArr[antrianIdx].Status_Antrian !== "Selesai") {
+                antrianArr[antrianIdx].Status_Antrian = "Selesai";
+                let now = new Date();
+                antrianArr[antrianIdx].Waktu_Selesai = `${now.getHours()}:${now.getMinutes()}`;
+                refreshKokiView();
+                renderPreviewPesanan();
+                alert("Pesanan telah selesai & diserahkan ke pelanggan!");
+            }
+        }
+
+        // OWNER: laporan berdasarkan tanggal
+        function generateLaporan() {
+            let tglInput = document.getElementById("tanggalLaporan").value;
+            if (!tglInput) return;
+            let [year, month, day] = tglInput.split("-");
+            let formattedTarget = `${day}/${month}/${year}`;
+            let transaksiFilter = transaksiArr.filter(t => t.Tanggal_Waktu.startsWith(formattedTarget));
+            if (transaksiFilter.length === 0) {
+                document.getElementById("laporanHasil").innerHTML = `<div class="card">📭 Tidak ada transaksi pada tanggal ${tglInput}</div>`;
+                return;
+            }
+            let totalPenjualan = 0;
+            let mapVariasi = new Map();
+            for (let trx of transaksiFilter) {
+                let pesan = pesananArr.find(p => p.ID_Pesanan === trx.ID_Pesanan);
+                if (pesan) totalPenjualan += pesan.Total_Harga;
+                let details = detailPesananArr.filter(d => d.ID_Pesanan === trx.ID_Pesanan);
+                for (let det of details) {
+                    let variasi = variasiMenu.find(v => v.ID_Variasi === det.ID_Variasi);
+                    if (variasi) {
+                        let nama = variasi.Nama_Variasi;
+                        if (!mapVariasi.has(det.ID_Variasi)) mapVariasi.set(det.ID_Variasi, { nama, jumlah: 0, pendapatan: 0 });
+                        let data = mapVariasi.get(det.ID_Variasi);
+                        data.jumlah += det.Jumlah;
+                        data.pendapatan += det.Subtotal;
+                    }
+                }
+            }
+            let rincianHtml = `<table><thead><tr><th>Menu Variasi</th><th>Jumlah Terjual</th><th>Pendapatan</th></tr></thead><tbody>`;
+            for (let [_, val] of mapVariasi.entries()) {
+                rincianHtml += `<tr><td>${val.nama}</td><td>${val.jumlah}</td><td>Rp ${val.pendapatan.toLocaleString()}</td></tr>`;
+            }
+            rincianHtml += `</tbody></table>`;
+            document.getElementById("laporanHasil").innerHTML = `
+            <div class="card">
+                <strong>📅 Laporan Tanggal: ${tglInput}</strong><br>
+                🧾 Total Pendapatan: <span style="font-size:1.5rem; color:#b91c1c;">Rp ${totalPenjualan.toLocaleString()}</span>
+                <hr>${rincianHtml}
+            </div>
+        `;
+        }
+
+        // event binding & init
+        document.getElementById("kategoriMenu").addEventListener("change", updateVariasiSelect);
+        document.getElementById("tambahKeranjangBtn").addEventListener("click", tambahKeKeranjang);
+        document.getElementById("prosesCheckoutBtn").addEventListener("click", prosesCheckout);
+        document.getElementById("refreshKoki")?.addEventListener("click", refreshKokiView);
+        document.getElementById("generateLaporanBtn")?.addEventListener("click", generateLaporan);
+        updateVariasiSelect();
+        renderKeranjang();
+        renderPreviewPesanan();
+        refreshKokiView();
+        // tab switching
+        const tabs = document.querySelectorAll('.tab-btn');
+        const contents = document.querySelectorAll('.tab-content');
+        tabs.forEach(btn => {
+            btn.addEventListener('click', () => {
+                let tabId = btn.getAttribute('data-tab');
+                contents.forEach(c => c.classList.remove('active'));
+                tabs.forEach(b => b.classList.remove('active'));
+                document.getElementById(tabId).classList.add('active');
+                btn.classList.add('active');
+                if (tabId === 'koki') refreshKokiView();
+                if (tabId === 'owner') generateLaporan();
+            });
+        });
+        setTimeout(() => { if (document.getElementById("owner").classList.contains("active")) generateLaporan(); }, 100);
+    </script>
+</body>
+
+</html>
