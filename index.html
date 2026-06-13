@@ -21,7 +21,6 @@
             padding: 2rem 1.5rem;
         }
 
-        /* container utama */
         .app-container {
             max-width: 1400px;
             margin: 0 auto;
@@ -32,7 +31,6 @@
             backdrop-filter: blur(2px);
         }
 
-        /* header merah-kuning khas warung */
         .hero-header {
             background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%);
             padding: 1.8rem 2rem;
@@ -46,7 +44,6 @@
             font-weight: 800;
             color: #fffbeb;
             text-shadow: 4px 4px 0 #991b1b;
-            word-break: keep-all;
         }
 
         .hero-header .sub {
@@ -74,7 +71,6 @@
             display: inline-block;
         }
 
-        /* tab navigasi */
         .tab-nav {
             display: flex;
             background: #fff2df;
@@ -98,11 +94,6 @@
             gap: 8px;
         }
 
-        .tab-btn i {
-            font-style: normal;
-            font-weight: bold;
-        }
-
         .tab-btn.active {
             background: #fbbf24;
             color: #7c2d12;
@@ -113,7 +104,6 @@
             background: #fed7aa;
         }
 
-        /* konten */
         .tab-content {
             display: none;
             padding: 2rem;
@@ -136,7 +126,6 @@
             }
         }
 
-        /* kartu & grid */
         .card {
             background: white;
             border-radius: 1.5rem;
@@ -255,7 +244,6 @@
             gap: 1.2rem;
         }
 
-        /* style struk modal */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -324,7 +312,7 @@
     <div class="app-container">
         <div class="hero-header">
             <h1>🍜 SISTEM WARUNG SEBLAK SOBA 🔥</h1>
-            <div class="sub">!!Pedasnya membara, Sensasinya juara!!</div>
+            <div class="sub">Pedasnya Nagih, Manajemennya Modern!</div>
         </div>
         <div class="team-names">
             Dibuat oleh Kelompok 1 :
@@ -448,6 +436,14 @@
             { ID_Variasi: "VAR002", ID_Menu: "MNU001", Nama_Variasi: "Sosis", Harga: 2000 },
             { ID_Variasi: "VAR003", ID_Menu: "MNU001", Nama_Variasi: "Kerupuk", Harga: 1000 },
             { ID_Variasi: "VAR004", ID_Menu: "MNU001", Nama_Variasi: "Dumpling", Harga: 3000 },
+            { ID_Variasi: "VAR009", ID_Menu: "MNU001", Nama_Variasi: "Kwetiau", Harga: 1500 },
+            { ID_Variasi: "VAR010", ID_Menu: "MNU001", Nama_Variasi: "Makaroni", Harga: 1500 },
+            { ID_Variasi: "VAR011", ID_Menu: "MNU001", Nama_Variasi: "Mie", Harga: 1500 },
+            { ID_Variasi: "VAR012", ID_Menu: "MNU001", Nama_Variasi: "Sayuran", Harga: 2000 },
+            { ID_Variasi: "VAR013", ID_Menu: "MNU001", Nama_Variasi: "Jamur Enoki", Harga: 2000 },
+            { ID_Variasi: "VAR014", ID_Menu: "MNU001", Nama_Variasi: "Cuanki Tahu", Harga: 1000 },
+            { ID_Variasi: "VAR015", ID_Menu: "MNU001", Nama_Variasi: "Siomay Kering", Harga: 500 },
+            { ID_Variasi: "VAR016", ID_Menu: "MNU001", Nama_Variasi: "Sayap", Harga: 7500 },
             { ID_Variasi: "VAR005", ID_Menu: "MNU002", Nama_Variasi: "Teh", Harga: 5000 },
             { ID_Variasi: "VAR006", ID_Menu: "MNU002", Nama_Variasi: "Es Jeruk", Harga: 7000 },
             { ID_Variasi: "VAR007", ID_Menu: "MNU002", Nama_Variasi: "Es Matcha", Harga: 6000 },
@@ -462,13 +458,11 @@
         ];
 
         // Data inti sistem
-        let pesananArr = [];        // {ID_Pesanan, Tanggal, Waktu, Nama_Pelanggan, Total_Harga, Layanan}
-        let detailPesananArr = [];  // {ID_Detail, ID_Pesanan, ID_Menu, ID_Variasi, ID_Kepedasan, Jumlah, Harga_Satuan, Subtotal}
-        let antrianArr = [];        // {ID_Antrian, ID_Pesanan, Nomor_Antrian, Waktu_Masuk, Status_Antrian, Waktu_Selesai}
-        let transaksiArr = [];      // {ID_Transaksi, ID_Pesanan, Tanggal_Waktu, Jumlah_Dibayar, Metode_Bayar, Status, Kembalian}
-        let strukArr = [];          // Untuk menyimpan data struk sesuai ERD (Nomor_Struk, ID_Transaksi, ID_Pesanan, Tanggal_Waktu, Total_Bayar, Metode_Bayar, Kembalian)
-
-        // Variabel untuk menyimpan data laporan terakhir (untuk keperluan download)
+        let pesananArr = [];
+        let detailPesananArr = [];
+        let antrianArr = [];
+        let transaksiArr = [];
+        let strukArr = [];
         let lastLaporanData = { tanggal: "", totalPenjualan: 0, rincian: [] };
 
         // Helper ID Generator
@@ -482,7 +476,6 @@
             return prefix + next;
         }
 
-        // Format waktu lokal
         function getCurrentDateTime() {
             let now = new Date();
             let tanggal = `${now.getDate().toString().padStart(2, '0')}/${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getFullYear()}`;
@@ -490,7 +483,7 @@
             return { tanggal, waktu, full: now };
         }
 
-        // Inisialisasi data contoh dari soal
+        // Inisialisasi data contoh dari soal (kondisi awal) - perbaiki Total_Bayar pada struk contoh
         function initContohData() {
             pesananArr = [
                 { ID_Pesanan: "PSN001", Tanggal: "01/06/2025", Waktu: "10:30", Nama_Pelanggan: "Ihsan", Total_Harga: 9000, Layanan: "Dine In" },
@@ -509,19 +502,16 @@
                 { ID_Transaksi: "TRX001", ID_Pesanan: "PSN001", Tanggal_Waktu: "01/06/2025 10:30", Jumlah_Dibayar: 10000, Metode_Bayar: "Tunai", Status: "Lunas", Kembalian: 1000 },
                 { ID_Transaksi: "TRX002", ID_Pesanan: "PSN002", Tanggal_Waktu: "01/06/2025 11:30", Jumlah_Dibayar: 5000, Metode_Bayar: "Qris", Status: "Lunas", Kembalian: 0 }
             ];
+            // Perbaikan: Total_Bayar pada struk harusnya total harga pesanan (9000 dan 5000), bukan jumlah bayar
             strukArr = [
-                { Nomor_Struk: "STR001", ID_Transaksi: "TRX001", ID_Pesanan: "PSN001", Tanggal_Waktu: "01/06/2025 10:30", Total_Bayar: 10000, Metode_Bayar: "Tunai", Kembalian: 1000 },
+                { Nomor_Struk: "STR001", ID_Transaksi: "TRX001", ID_Pesanan: "PSN001", Tanggal_Waktu: "01/06/2025 10:30", Total_Bayar: 9000, Metode_Bayar: "Tunai", Kembalian: 1000 },
                 { Nomor_Struk: "STR002", ID_Transaksi: "TRX002", ID_Pesanan: "PSN002", Tanggal_Waktu: "01/06/2025 11:30", Total_Bayar: 5000, Metode_Bayar: "Qris", Kembalian: 0 }
             ];
         }
         initContohData();
 
-        // Keranjang sementara untuk kasir
-        let keranjang = []; // { ID_Menu, ID_Variasi, NamaVariasi, HargaSatuan, Jumlah, ID_Kepedasan, NamaPedas, Subtotal }
-        let currentNamaPelanggan = "";
-        let currentLayanan = "Dine In";
+        let keranjang = [];
 
-        // Render variasi berdasarkan kategori menu
         function updateVariasiSelect() {
             let kategori = document.getElementById("kategoriMenu").value;
             let filtered = variasiMenu.filter(v => v.ID_Menu === kategori);
@@ -538,7 +528,6 @@
             document.getElementById("pedasInfoNote").style.opacity = isSeblak ? "1" : "0.5";
         }
 
-        // tambah keranjang
         function tambahKeKeranjang() {
             let kategoriMenu = document.getElementById("kategoriMenu").value;
             let idVariasi = document.getElementById("variasiSelect").value;
@@ -592,9 +581,7 @@
             renderKeranjang();
         }
 
-        // Fungsi menampilkan struk (modal)
         function tampilkanStruk(dataStruk, detailItems, nomorAntrian, namaPelanggan, layanan) {
-            // Buat overlay modal
             const modal = document.createElement('div');
             modal.className = 'modal-overlay';
             let itemsHtml = '';
@@ -629,7 +616,6 @@
             modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
         }
 
-        // Proses checkout: simpan pesanan, transaksi, antrian, dan cetak struk
         function prosesCheckout() {
             let namaPel = document.getElementById("namaPelanggan").value.trim();
             if (namaPel === "") { alert("Masukkan nama pelanggan!"); return; }
@@ -642,10 +628,10 @@
                 return;
             }
             let kembalian = jumlahBayar - totalHarga;
-            const { tanggal, waktu, full } = getCurrentDateTime();
+            const { tanggal, waktu } = getCurrentDateTime();
             let idPesanan = generateId("PSN", pesananArr, "ID_Pesanan");
             let layanan = document.getElementById("jenisLayanan").value;
-            // simpan pesanan
+
             let newPesanan = {
                 ID_Pesanan: idPesanan,
                 Tanggal: tanggal,
@@ -655,7 +641,7 @@
                 Layanan: layanan
             };
             pesananArr.push(newPesanan);
-            // simpan detail
+
             let detailCounter = detailPesananArr.length;
             for (let item of keranjang) {
                 let idDetail = `DTL${(++detailCounter).toString().padStart(3, '0')}`;
@@ -670,7 +656,7 @@
                     Subtotal: item.Subtotal
                 });
             }
-            // transaksi
+
             let idTrx = generateId("TRX", transaksiArr, "ID_Transaksi");
             let tglWaktuStr = `${tanggal} ${waktu}`;
             let newTransaksi = {
@@ -683,7 +669,7 @@
                 Kembalian: kembalian
             };
             transaksiArr.push(newTransaksi);
-            // antrian
+
             let maxAntrianNum = 0;
             antrianArr.forEach(a => { let num = parseInt(a.Nomor_Antrian.substring(1)); if (num > maxAntrianNum) maxAntrianNum = num; });
             let nomorBaru = `A${(maxAntrianNum + 1).toString().padStart(2, '0')}`;
@@ -697,20 +683,20 @@
                 Waktu_Selesai: null
             };
             antrianArr.push(newAntrian);
-            // struk
+
             let nomorStruk = generateId("STR", strukArr, "Nomor_Struk");
+            // PERBAIKAN: Total_Bayar pada struk harusnya total harga pesanan (totalHarga), bukan jumlahBayar
             let newStruk = {
                 Nomor_Struk: nomorStruk,
                 ID_Transaksi: idTrx,
                 ID_Pesanan: idPesanan,
                 Tanggal_Waktu: tglWaktuStr,
-                Total_Bayar: jumlahBayar,
+                Total_Bayar: totalHarga,   // <-- perbaikan utama
                 Metode_Bayar: metode,
                 Kembalian: kembalian
             };
             strukArr.push(newStruk);
 
-            // Simpan salinan detail items untuk struk
             const detailItemsUntukStruk = keranjang.map(item => ({
                 NamaVariasi: item.NamaVariasi,
                 Jumlah: item.Jumlah,
@@ -718,14 +704,12 @@
                 Subtotal: item.Subtotal
             }));
 
-            // kosongkan keranjang dan form
             keranjang = [];
             renderKeranjang();
             document.getElementById("namaPelanggan").value = "";
             document.getElementById("jumlahBayar").value = "";
             document.getElementById("checkoutMessage").innerHTML = `✅ Pesanan berhasil! Antrian: ${nomorBaru} (${namaPel}) - Total Rp ${totalHarga.toLocaleString()}`;
 
-            // TAMPILKAN STRUK SESUAI ERD
             tampilkanStruk(newStruk, detailItemsUntukStruk, nomorBaru, namaPel, layanan);
 
             setTimeout(() => { document.getElementById("checkoutMessage").innerHTML = ""; }, 4000);
@@ -734,18 +718,27 @@
         }
 
         function renderPreviewPesanan() {
-            let container = document.getElementById("pesananTerbaruPreview");
+            const container = document.getElementById("pesananTerbaruPreview");
             if (!container) return;
-            if (pesananArr.length === 0) { container.innerHTML = "<i>Belum ada pesanan</i>"; return; }
-            let html = `<table><thead><tr><th>ID Pesanan</th><th>Pelanggan</th><th>Total</th><th>Waktu</th></tr></thead><tbody>`;
-            pesananArr.slice(-4).forEach(p => {
-                html += `<tr><td>${p.ID_Pesanan}</td><td>${p.Nama_Pelanggan}</td><td>Rp ${p.Total_Harga.toLocaleString()}</td><td>${p.Waktu}</td></tr>`;
-            });
+            if (pesananArr.length === 0) {
+                container.innerHTML = "<div style='padding:1rem; text-align:center; color:#7c2d12;'>Belum ada pesanan</div>";
+                return;
+            }
+            let pesananTerbaru = [...pesananArr].reverse().slice(0, 5);
+            let html = `<table><thead><tr><th>ID Pesanan</th><th>Pelanggan</th><th>Total</th><th>Waktu</th><th>Layanan</th></tr></thead><tbody>`;
+            for (let p of pesananTerbaru) {
+                html += `<tr>
+                        <td>${p.ID_Pesanan}</td>
+                        <td>${p.Nama_Pelanggan}</td>
+                        <td>Rp ${p.Total_Harga.toLocaleString()}</td>
+                        <td>${p.Waktu}</td>
+                        <td>${p.Layanan === 'Dine In' ? '🍽️ Makan di Tempat' : '🥡 Bawa Pulang'}</td>
+                     </tr>`;
+            }
             html += `</tbody></table>`;
             container.innerHTML = html;
         }
 
-        // KOKI : tampilkan antrian yang belum selesai (status Menunggu)
         function refreshKokiView() {
             const container = document.getElementById("antrianKokiList");
             let antrianBelumSelesai = antrianArr.filter(a => a.Status_Antrian !== "Selesai");
@@ -793,7 +786,6 @@
             }
         }
 
-        // OWNER: laporan berdasarkan tanggal (sekaligus menyimpan data untuk download)
         function generateLaporan() {
             let tglInput = document.getElementById("tanggalLaporan").value;
             if (!tglInput) return;
@@ -806,7 +798,7 @@
                 return;
             }
             let totalPenjualan = 0;
-            let mapVariasi = new Map(); // key ID_Variasi -> {nama, jumlah, pendapatan}
+            let mapVariasi = new Map();
             for (let trx of transaksiFilter) {
                 let pesan = pesananArr.find(p => p.ID_Pesanan === trx.ID_Pesanan);
                 if (pesan) totalPenjualan += pesan.Total_Harga;
@@ -836,7 +828,6 @@
                 <hr>${rincianHtml}
             </div>
         `;
-            // simpan data laporan terakhir untuk download
             lastLaporanData = {
                 tanggal: tglInput,
                 totalPenjualan: totalPenjualan,
@@ -844,13 +835,11 @@
             };
         }
 
-        // Fungsi download laporan ke file XLSX
         function downloadLaporan() {
             if (!lastLaporanData.tanggal || (lastLaporanData.rincian.length === 0 && lastLaporanData.totalPenjualan === 0)) {
                 alert("Tidak ada data laporan untuk diunduh. Pastikan Anda telah memilih tanggal dan menampilkan laporan terlebih dahulu.");
                 return;
             }
-            // Siapkan data untuk sheet Excel
             let sheetData = [
                 ["LAPORAN PENJUALAN SEBLAK SOBA"],
                 [`Tanggal: ${lastLaporanData.tanggal}`],
@@ -862,20 +851,15 @@
             for (let item of lastLaporanData.rincian) {
                 sheetData.push([item.nama, item.jumlah, item.pendapatan]);
             }
-            // Tambahkan baris kosong dan footer
             sheetData.push([], ["Dibuat oleh Sistem Warung Seblak Soba"], [new Date().toLocaleString()]);
-
-            // Buat workbook dan worksheet
             const ws = XLSX.utils.aoa_to_sheet(sheetData);
-            // Atur lebar kolom (opsional)
             ws['!cols'] = [{ wch: 25 }, { wch: 15 }, { wch: 18 }];
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Laporan Penjualan");
-            // Export file
             XLSX.writeFile(wb, `Laporan_Penjualan_${lastLaporanData.tanggal}.xlsx`);
         }
 
-        // event binding & init
+        // Event binding & init
         document.getElementById("kategoriMenu").addEventListener("change", updateVariasiSelect);
         document.getElementById("tambahKeranjangBtn").addEventListener("click", tambahKeKeranjang);
         document.getElementById("prosesCheckoutBtn").addEventListener("click", prosesCheckout);
@@ -886,7 +870,7 @@
         renderKeranjang();
         renderPreviewPesanan();
         refreshKokiView();
-        // tab switching
+
         const tabs = document.querySelectorAll('.tab-btn');
         const contents = document.querySelectorAll('.tab-content');
         tabs.forEach(btn => {
